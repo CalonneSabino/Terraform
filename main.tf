@@ -15,8 +15,8 @@ provider "aws" {
 }
 
 # Repositório ECR
-resource "aws_ecr_repository" "frontend" {
-  name = "pomodoro-front"
+resource "aws_ecr_repository" "pomodoro-terraform" {
+  name = "pomodoro-terraform"
 
   image_scanning_configuration {
     scan_on_push = true
@@ -55,7 +55,7 @@ resource "aws_security_group" "launch-wizard-5" {
   }
 }
 
-resource "aws_instance" "pomodoro" {
+resource "aws_instance" "pomodoro-terraform" {
   ami           = "ami-0634f3c109dcdc659" 
   instance_type = "t3.micro"
   key_name      = "hello-teste-aws" 
@@ -63,7 +63,7 @@ resource "aws_instance" "pomodoro" {
   vpc_security_group_ids =  ["sg-0583a55e503b82036"]
 
   tags = {
-    Name = "Pomodoro"
+    Name = "Pomodoro-terraform"
   }
 }
 
