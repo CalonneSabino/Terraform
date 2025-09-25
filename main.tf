@@ -75,5 +75,5 @@ output "ecr_url" {
 
 output "ec2_public_ip" {
   description = "IP público da instância EC2"
-  value       = aws_instance.pomodoro.public_ip
+  value       = aws_instance.pomodoro-terraform.public_ip
 }
