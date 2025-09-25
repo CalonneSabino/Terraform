@@ -70,7 +70,7 @@ resource "aws_instance" "pomodoro-terraform" {
 
 output "ecr_url" {
   description = "URL do repositório ECR"
-  value       = aws_ecr_repository.frontend.repository_url
+  value       = aws_ecr_repository.pomodoro-terraform.repository_url
 }
 
 output "ec2_public_ip" {
