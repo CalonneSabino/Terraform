@@ -28,8 +28,8 @@ resource "aws_ecr_repository" "pomodoro-terraform" {
 }
 
 # Security Group para EC2
-resource "aws_security_group" "launch-wizard-5" {
-  name        = "launch-wizard-5"
+resource "aws_security_group" "launch-terr" {
+  name        = "launch-terr"
   description = "Liberar acesso HTTP e SSH"
   vpc_id      = "vpc-0dd592760b502e7d0" 
 
