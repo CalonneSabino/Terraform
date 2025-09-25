@@ -60,7 +60,7 @@ resource "aws_instance" "pomodoro" {
   instance_type = "t3.micro"
   key_name      = "hello-teste-aws" 
 
-  vpc_security_group_ids = [sg-0583a55e503b82036]
+  vpc_security_group_ids =  [aws_security_group.minha_sg.id]
 
   tags = {
     Name = "Pomodoro"
