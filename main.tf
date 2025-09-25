@@ -16,7 +16,7 @@ provider "aws" {
 
 # Repositório ECR
 resource "aws_ecr_repository" "frontend" {
-  name = "pomodoro-frontend"
+  name = "pomodoro-front"
 
   image_scanning_configuration {
     scan_on_push = true
@@ -28,8 +28,8 @@ resource "aws_ecr_repository" "frontend" {
 }
 
 # Security Group para EC2
-resource "aws_security_group" "pomodoro_sg" {
-  name        = "pomodoro-sg"
+resource "aws_security_group" "launch-wizard-5" {
+  name        = "launch-wizard-5"
   description = "Liberar acesso HTTP e SSH"
   vpc_id      = "vpc-0dd592760b502e7d0" 
 
