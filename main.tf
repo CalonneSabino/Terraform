@@ -13,7 +13,7 @@ provider "aws" {
   region = "us-east-2"
 }
 
-#  VPC
+# Criar VPC
 resource "aws_vpc" "pomodoro" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
@@ -24,6 +24,7 @@ resource "aws_vpc" "pomodoro" {
   }
 }
 
+# Criar Subnet pública
 resource "aws_subnet" "pomodoro_public" {
   vpc_id                  = aws_vpc.pomodoro.id
   cidr_block              = "10.0.1.0/24"
@@ -44,7 +45,7 @@ resource "aws_internet_gateway" "pomodoro" {
   }
 }
 
-
+# Route Table
 resource "aws_route_table" "pomodoro" {
   vpc_id = aws_vpc.pomodoro.id
 
@@ -58,6 +59,7 @@ resource "aws_route_table" "pomodoro" {
   }
 }
 
+# Associar Subnet à Route Table
 resource "aws_route_table_association" "pomodoro" {
   subnet_id      = aws_subnet.pomodoro_public.id
   route_table_id = aws_route_table.pomodoro.id
@@ -122,7 +124,7 @@ resource "aws_instance" "pomodoro" {
   }
 }
 
-# Outputs
+# Saídas
 output "ecr_url" {
   description = "URL do repositório ECR"
   value       = aws_ecr_repository.pomodoro.repository_url
