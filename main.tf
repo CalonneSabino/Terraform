@@ -17,7 +17,7 @@ provider "aws" {
   region = "us-east-2"
 }
 
-# Use default VPC to avoid permission issues
+# Usando a VPC padrao pra nao ter problemas de permissao
 data "aws_vpc" "default" {
   default = true
 }
@@ -47,19 +47,25 @@ resource "random_id" "suffix" {
   byte_length = 4
 }
 
-# Instância EC2 using default VPC
-resource "aws_instance" "pomodoro" {
-  ami           = "ami-0634f3c109dcdc659"
+# Instância EC2 com defalt VPC
+resource "aws_instance" "meu_servidor" {
+  ami           = "ami-0c55b159cbfafe1f0"
   instance_type = "t3.micro"
   key_name      = "hello-teste-aws"
 
   subnet_id                   = data.aws_subnets.default.ids[0]
   associate_public_ip_address = true
 
+  user_data = <<-EOF
+    #!/bin/bash
+    hostnamectl set-hostname Pomodoro-terraform
+    echo "127.0.0.1 Pomodoro-terraform" >> /etc/hosts
+  EOF
+
   # Use default security group to avoid permission issues
 }
 
-# Saídas
+# Outputs
 output "ecr_url" {
   description = "URL do repositório ECR"
   value       = aws_ecr_repository.pomodoro.repository_url
@@ -67,5 +73,5 @@ output "ecr_url" {
 
 output "ec2_public_ip" {
   description = "IP público da instância EC2"
-  value       = aws_instance.pomodoro.public_ip
+  value       = aws_instance.meu_servidor.public_ip
 }
