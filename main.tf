@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
   }
 
   required_version = ">= 1.9.0"
@@ -13,93 +17,21 @@ provider "aws" {
   region = "us-east-2"
 }
 
-# Criar VPC
-resource "aws_vpc" "pomodoro" {
-  cidr_block           = "10.0.0.0/16"
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-
-  tags = {
-    Name = "pomodoro-vpc"
-  }
+# Use default VPC to avoid permission issues
+data "aws_vpc" "default" {
+  default = true
 }
 
-# Criar Subnet pública
-resource "aws_subnet" "pomodoro_public" {
-  vpc_id                  = aws_vpc.pomodoro.id
-  cidr_block              = "10.0.1.0/24"
-  availability_zone       = "us-east-2a"
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "pomodoro-subnet"
-  }
-}
-
-# Internet Gateway
-resource "aws_internet_gateway" "pomodoro" {
-  vpc_id = aws_vpc.pomodoro.id
-
-  tags = {
-    Name = "pomodoro-igw"
-  }
-}
-
-# Route Table
-resource "aws_route_table" "pomodoro" {
-  vpc_id = aws_vpc.pomodoro.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.pomodoro.id
-  }
-
-  tags = {
-    Name = "pomodoro-rt"
-  }
-}
-
-# Associar Subnet à Route Table
-resource "aws_route_table_association" "pomodoro" {
-  subnet_id      = aws_subnet.pomodoro_public.id
-  route_table_id = aws_route_table.pomodoro.id
-}
-
-# Security Group
-resource "aws_security_group" "pomodoro" {
-  name        = "pomodoro-sg"
-  description = "Liberar acesso HTTP e SSH"
-  vpc_id      = aws_vpc.pomodoro.id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "pomodoro-sg"
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
   }
 }
 
 # Repositório ECR
 resource "aws_ecr_repository" "pomodoro" {
-  name = "pomodoro-terraform"
+  name = "pomodoro-app-${random_id.suffix.hex}"
 
   image_scanning_configuration {
     scan_on_push = true
@@ -110,18 +42,21 @@ resource "aws_ecr_repository" "pomodoro" {
   }
 }
 
-# Instância EC2
+# Random suffix to avoid naming conflicts
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
+# Instância EC2 using default VPC
 resource "aws_instance" "pomodoro" {
   ami           = "ami-0634f3c109dcdc659"
   instance_type = "t3.micro"
   key_name      = "hello-teste-aws"
 
-  subnet_id              = aws_subnet.pomodoro_public.id
-  vpc_security_group_ids = [aws_security_group.pomodoro.id]
+  subnet_id                   = data.aws_subnets.default.ids[0]
+  associate_public_ip_address = true
 
-  tags = {
-    Name = "Pomodoro-terraform"
-  }
+  # Use default security group to avoid permission issues
 }
 
 # Saídas
