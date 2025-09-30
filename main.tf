@@ -54,7 +54,7 @@ resource "aws_ecr_repository" "pomodoro" {
 
 # Security Group
 resource "aws_security_group" "ssh_access" {
-  name        = "ssh-access"
+  name        = "ssh-access-${random_id.suffix.hex}"
   description = "Permite acesso SSH do meu IP"
   vpc_id      = data.aws_vpc.default.id
 }
