@@ -94,6 +94,10 @@ resource "aws_instance" "meu_servidor" {
     hostnamectl set-hostname Pomodoro-terraform
     echo "127.0.0.1 Pomodoro-terraform" >> /etc/hosts
   EOF
+
+  provisioner "local-exec" {
+    command = "chmod 400 ~/.ssh/hello-teste-aws.pem || true"
+  }
 }
 
 # Outputs
