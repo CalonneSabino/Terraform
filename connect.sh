@@ -5,7 +5,7 @@ KEY_PATH="$HOME/.ssh/hello-teste-aws.pem"
 
 # Ajustar permissões da chave SSH
 echo "Ajustando permissões da chave SSH..."
-chmod 400 "$KEY_PATH"
+chmod 775 "$KEY_PATH"
 
 # Obter IP público da instância
 echo "Obtendo IP público da instância..."
