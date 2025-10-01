@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # Script para conectar à instância EC2
-KEY_PATH="$HOME/.ssh/hello-teste-aws.pem"
+KEY_PATH="$HOME/Downloads/hello-teste-aws.pem"
+
 
 # Ajustar permissões da chave SSH
 echo "Ajustando permissões da chave SSH..."
-chmod 775 "$KEY_PATH"
+chmod 400 "$KEY_PATH"
 
 # Obter IP público da instância
 echo "Obtendo IP público da instância..."
@@ -19,5 +20,5 @@ fi
 echo "IP público: $PUBLIC_IP"
 echo "Conectando via SSH..."
 
-# Conectar via SSH
+# Conectando a SSH
 ssh -i "$KEY_PATH" ubuntu@"$PUBLIC_IP"

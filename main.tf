@@ -8,10 +8,6 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.1"
     }
-    http = {
-      source  = "hashicorp/http"
-      version = "~> 3.0"
-    }
   }
 
   required_version = ">= 1.9.0"
@@ -55,17 +51,38 @@ resource "aws_ecr_repository" "pomodoro" {
 # Security Group
 resource "aws_security_group" "ssh_access" {
   name        = "ssh-access-${random_id.suffix.hex}"
-  description = "Permite acesso SSH do meu IP"
+  description = "Permite acesso SSH, HTTP e HTTPS"
   vpc_id      = data.aws_vpc.default.id
 }
 
-# Regra de ingresso SSH
+# Regras de Ingress
+## SSH 
 resource "aws_security_group_rule" "ssh_ingress" {
   type              = "ingress"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = ["177.26.234.228/32"]
+  cidr_blocks       = ["189.40.89.114/32"]
+  security_group_id = aws_security_group.ssh_access.id
+}
+
+## HTTP - público
+resource "aws_security_group_rule" "http_ingress" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ssh_access.id
+}
+
+## HTTPS - público
+resource "aws_security_group_rule" "https_ingress" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.ssh_access.id
 }
 
@@ -83,7 +100,7 @@ resource "aws_security_group_rule" "all_egress" {
 resource "aws_instance" "meu_servidor" {
   ami           = "ami-0fb653ca2d3203ac1" # Ubuntu 22.04 LTS us-east-2
   instance_type = "t3.micro"
-  key_name      = "hello-teste-aws"     
+  key_name      = "hello-teste-aws"
 
   subnet_id                   = data.aws_subnets.default.ids[0]
   associate_public_ip_address = true
@@ -96,7 +113,8 @@ resource "aws_instance" "meu_servidor" {
   EOF
 
   provisioner "local-exec" {
-    command = "chmod 400 ~/.ssh/hello-teste-aws.pem || true"
+    command = "chmod 400 ~/Downloads/hello-teste-aws.pem || true"
+
   }
 }
 
